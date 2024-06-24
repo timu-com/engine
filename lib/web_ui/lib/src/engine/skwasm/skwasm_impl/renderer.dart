@@ -472,7 +472,6 @@ class SkwasmRenderer implements Renderer {
       surface.handle,
     ));
   }
-}
 
   @override
   FutureOr<ui.Image> createImageFromTextureSource(JSAny textureSource, { required int width, required int height, required bool transferOwnership }) async {
@@ -486,7 +485,7 @@ class SkwasmRenderer implements Renderer {
       surface.handle,
     ));
   }
-
+}
 class SkwasmPictureRenderer implements PictureRenderer {
   SkwasmPictureRenderer(this.surface);
 
