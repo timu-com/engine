@@ -362,6 +362,11 @@ class HtmlRenderer implements Renderer {
   );
 
   @override
+  FutureOr<ui.Image> createImageFromTextureSource(JSAny object,  { required int width, required int height, required bool transferOwnership }) {
+    throw Exception('Not implemented for HTML renderer');
+  }
+
+  @override
   Future<ui.Image> createImageFromImageBitmap(DomImageBitmap imageSource) async {
     final int width = imageSource.width.toDartInt;
     final int height = imageSource.height.toDartInt;
