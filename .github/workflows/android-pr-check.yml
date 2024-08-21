@@ -1,0 +1,81 @@
+name: Android Pull Request Check
+
+on:
+  # Manual Trigger
+  workflow_dispatch:
+
+  push:
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android_check:
+    runs-on: my-ubuntu-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v4
+
+    - name: android check
+      run: |
+        uname -s && uname -m
+
+        cd ..
+        MY_ROOT=`pwd`
+        mkdir -p ${MY_ROOT}/my-flutter/engine
+
+        cd ${MY_ROOT}/my-flutter
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        export PATH=${MY_ROOT}/my-flutter/depot_tools:$PATH
+
+        cd ${MY_ROOT}/my-flutter/engine
+        git clone https://github.com/flutter/buildroot src
+
+        cp -r ${GITHUB_WORKSPACE} ${MY_ROOT}/my-flutter/engine/src
+        mv ${MY_ROOT}/my-flutter/engine/src/engine ${MY_ROOT}/my-flutter/engine/src/flutter
+
+        cd ${MY_ROOT}/my-flutter/engine
+        echo 'solutions = [{"custom_deps": {},"custom_vars":{"download_emsdk": True},"deps_file": "DEPS","managed": False,"name": "src/flutter","safesync_url": "","url": "https://github.com/${GITHUB_REPOSITORY}",},]' > .gclient
+
+        FLUTTER_API_BRANCH=main
+        if [ "${FLUTTER_API_BRANCH_OVERRIDE}" != "" ]; then
+          FLUTTER_API_BRANCH=${FLUTTER_BRANCH_OVERRIDE}
+        elif git ls-remote --heads ${FLUTTER_API_GIT_URL} ${GITHUB_BASE_REF} | grep ${GITHUB_BASE_REF} > /dev/null; then
+          FLUTTER_API_BRANCH=${GITHUB_BASE_REF}
+        fi
+
+        #cd ${MY_ROOT}/my-flutter
+        #git clone ${FLUTTER_API_GIT_URL}
+        #cd flutter && git ${FLUTTER_BRANCH}
+
+        cd ${MY_ROOT}/my-flutter/engine
+        gclient sync
+
+        export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
+        export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
+
+        cd ${MY_ROOT}/my-flutter/engine/src
+        # for device-side executables.
+        ./flutter/tools/gn --android --unoptimized
+        # for newer 64-bit Android devices.
+        ./flutter/tools/gn --android --android-cpu arm64 --unoptimized
+        # for x86 emulators. 
+        ./flutter/tools/gn --android --android-cpu x86 --unoptimized 
+        # for x64 emulators.
+        ./flutter/tools/gn --android --android-cpu x64 --unoptimized 
+        # for host-side executables, needed to compile the cod
+        ./flutter/tools/gn --unoptimized 
+
+        # for device-side executables.
+        ninja -C out/android_debug_unopt
+        # for newer 64-bit Android devices. 
+        ninja -C out/android_debug_unopt_arm64 
+        # for x86 emulators.
+        ninja -C out/android_debug_unopt_x86 
+        # for x64 emulators.
+        ninja -C out/android_debug_unopt_x64 
+        # (or ninja -C out/host_debug_unopt_arm64, see above) for host-side executables.
+        ninja -C out/host_debug_unopt
+
+        ./flutter/testing/run_tests.py --type=engine

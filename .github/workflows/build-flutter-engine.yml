@@ -1,0 +1,39 @@
+name: Build Flutter Engine Release Linux
+
+on:
+  # Manual Trigger
+  workflow_dispatch:
+
+  push:
+    branches:
+    - 3.24.0-custom-main
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-flutter-engine-release-linux:
+    runs-on: my-ubuntu-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v4
+      with:
+        lfs: 'true'
+        submodules: recursive
+
+    - name: Authenticate gcloud
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCS_CREDENTIALS }}'
+
+    - name: Install gcloud
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        version: '>= 488.0.0'
+        install_components: 'beta'
+    
+    - name: Build the flutter engine release linux
+      uses: ./.github/actions/build-flutter-engine
+      with:
+        gcs_bucket: powerboards-my-flutter-builds

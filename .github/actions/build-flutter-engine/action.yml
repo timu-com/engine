@@ -1,0 +1,84 @@
+name: Build Flutter Engine
+description: Build the flutter engine
+
+inputs:
+  gcs_bucket:
+    description: The GCS bucket name where the engine build output will be stored
+    required: true
+    
+runs:
+  using: composite
+  steps:
+
+  - name: Build for release
+    shell: bash
+    run: |
+      uname -s && uname -m
+
+      cd ..
+      MY_ROOT=`pwd`
+      mkdir -p ${MY_ROOT}/my-flutter/engine
+
+      cd ${MY_ROOT}/my-flutter
+      git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+      export PATH=${MY_ROOT}/my-flutter/depot_tools:$PATH
+
+      cd ${MY_ROOT}/my-flutter/engine
+      git clone https://github.com/flutter/buildroot src
+
+      cp -r ${GITHUB_WORKSPACE} ${MY_ROOT}/my-flutter/engine/src
+      mv ${MY_ROOT}/my-flutter/engine/src/engine ${MY_ROOT}/my-flutter/engine/src/flutter
+
+      cd ${MY_ROOT}/my-flutter/engine
+      echo 'solutions = [{"custom_deps": {},"custom_vars":{"download_emsdk": True},"deps_file": "DEPS","managed": False,"name": "src/flutter","safesync_url": "","url": "https://github.com/${GITHUB_REPOSITORY}",},]' > .gclient
+
+
+      echo git ls-remote --heads ${{env.FLUTTER_API_GIT_URL}} ${GITHUB_REF_NAME}
+
+      FLUTTER_API_BRANCH=main
+      if [ "${FLUTTER_API_BRANCH_OVERRIDE}" != "" ]; then
+        FLUTTER_API_BRANCH=${FLUTTER_BRANCH_OVERRIDE}
+      elif git ls-remote --heads ${{env.FLUTTER_API_GIT_URL}} ${GITHUB_REF_NAME} | grep ${GITHUB_REF_NAME} > /dev/null; then
+        FLUTTER_API_BRANCH=${GITHUB_REF_NAME}
+      fi
+
+      #cd ${MY_ROOT}/my-flutter
+      #git clone ${FLUTTER_API_GIT_URL}
+      #cd flutter && git ${FLUTTER_BRANCH}
+
+      cd ${MY_ROOT}/my-flutter/engine
+      gclient sync
+
+      export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
+      export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
+
+      cd ${MY_ROOT}/my-flutter
+      felt build
+
+      cd ${MY_ROOT}
+      
+      # Trim the engine source as much as possible.
+      # I don't know what the minimum set of required files are
+      # Required (do not delete): 
+      # - engine/src/out
+      # - engine/src/flutter/prebuilts
+
+      rm -rf my-flutter/depot_tools
+
+      # Clear out the flutter folder except for prebuilts and out folder
+      mv my-flutter/engine/src/out .
+      mv my-flutter/engine/src/flutter/prebuilts .        
+      rm -rf my-flutter/engine/*
+
+      # Copy back the required folder to their original location
+      mkdir -p my-flutter/engine/src/flutter
+      mv ./prebuilts my-flutter/engine/src/flutter
+      mv ./out my-flutter/engine/src
+
+      # Delete the flutter client api
+      rm -rf my-flutter/flutter
+
+      FILE_NAME=brandon-my-flutter-build-${GITHUB_REF_NAME}-release-linux.tar.gzip
+      tar -czf ${FILE_NAME} my-flutter
+      gcloud storage cp ${FILE_NAME} gs://${{inputs.gcs_bucket}}
+      echo saved ${FILE_NAME} to gs://${{inputs.gcs_bucket}}
