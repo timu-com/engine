@@ -55,6 +55,9 @@ jobs:
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
+        env
+        export ANDROID_HOME=/home/runner/work/engine/my-flutter/engine/src/flutter/third_party/android_tools/sdk
+
         cd ${MY_ROOT}/my-flutter/engine/src
         # for device-side executables.
         ./flutter/tools/gn --android --unoptimized
