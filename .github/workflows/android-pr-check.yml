@@ -78,4 +78,6 @@ jobs:
         # (or ninja -C out/host_debug_unopt_arm64, see above) for host-side executables.
         ninja -C out/host_debug_unopt
 
+        env
+        export ANDROID_HOME=/home/runner/work/engine/my-flutter/engine/src/flutter/third_party/android_tools/sdk
         ./flutter/testing/run_tests.py --type=engine
