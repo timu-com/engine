@@ -149,6 +149,7 @@ jobs:
 
     - name: android test
       run: |
+        cd ..
         MY_ROOT=`pwd`
         cd ${MY_ROOT}/my-flutter/engine
         ./flutter/testing/run_tests.py --type=engine
