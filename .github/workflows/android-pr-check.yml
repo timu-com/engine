@@ -54,6 +54,10 @@ jobs:
 
     - name: build something 1
       run: |
+
+        cd ..
+        MY_ROOT=`pwd`
+
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
@@ -70,6 +74,9 @@ jobs:
 
     - name: build something 2
       run: |
+
+        cd ..
+        MY_ROOT=`pwd`
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
@@ -85,6 +92,8 @@ jobs:
 
     - name: build something 3
       run: |
+        cd ..
+        MY_ROOT=`pwd`
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
@@ -101,6 +110,8 @@ jobs:
 
     - name: build something 4
       run: |
+        cd ..
+        MY_ROOT=`pwd`
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
@@ -116,6 +127,8 @@ jobs:
 
     - name: build something 6
       run: |
+        cd ..
+        MY_ROOT=`pwd`
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
