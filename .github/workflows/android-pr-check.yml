@@ -52,35 +52,6 @@ jobs:
         cd ${MY_ROOT}/my-flutter/engine
         gclient sync
 
-        export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
-        export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
-
-        export ANDROID_HOME=/home/runner/work/engine/my-flutter/engine/src/flutter/third_party/android_tools/sdk
-        unset ANDROID_SDK_ROOT
-
-        cd ${MY_ROOT}/my-flutter/engine/src
-        # for device-side executables.
-        ./flutter/tools/gn --android --unoptimized
-        # for newer 64-bit Android devices.
-        ./flutter/tools/gn --android --android-cpu arm64 --unoptimized
-        # for x86 emulators. 
-        ./flutter/tools/gn --android --android-cpu x86 --unoptimized 
-        # for x64 emulators.
-        ./flutter/tools/gn --android --android-cpu x64 --unoptimized 
-        # for host-side executables, needed to compile the cod
-        ./flutter/tools/gn --unoptimized 
-
-        # for device-side executables.
-        ninja -C out/android_debug_unopt
-        # for newer 64-bit Android devices. 
-        ninja -C out/android_debug_unopt_arm64 
-        # for x86 emulators.
-        ninja -C out/android_debug_unopt_x86 
-        # for x64 emulators.
-        ninja -C out/android_debug_unopt_x64 
-        # (or ninja -C out/host_debug_unopt_arm64, see above) for host-side executables.
-        ninja -C out/host_debug_unopt
-
     - name: build something 1
       run: |
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
