@@ -151,7 +151,7 @@ jobs:
       run: |
         cd ..
         MY_ROOT=`pwd`
-        cd ${MY_ROOT}/my-flutter/engine
+        cd ${MY_ROOT}/my-flutter/engine/src
         ./flutter/testing/run_tests.py --type=engine
         ./flutter/testing/run_tests.py --type=java
         ./flutter/testing/run_tests.py --type=android
