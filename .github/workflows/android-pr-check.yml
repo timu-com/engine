@@ -81,7 +81,4 @@ jobs:
         # (or ninja -C out/host_debug_unopt_arm64, see above) for host-side executables.
         #ninja -C out/host_debug_unopt
 
-    - name: android test
-      run: |
-        cd ${MY_ROOT}/my-flutter/engine
         ./flutter/testing/run_tests.py --type=engine
