@@ -62,10 +62,10 @@ jobs:
         ninja -C out/ios_debug_unopt
         ninja -C out/host_debug_unopt
         
-  - name: android test
-    run: |
-      cd ..
-      MY_ROOT=`pwd`
-      cd ${MY_ROOT}/my-flutter/engine/src
-      ./flutter/testing/run_tests.py --type=dart
-      ./flutter/testing/run_tests.py --type=engine
+    - name: android test
+      run: |
+        cd ..
+        MY_ROOT=`pwd`
+        cd ${MY_ROOT}/my-flutter/engine/src
+        ./flutter/testing/run_tests.py --type=dart
+        ./flutter/testing/run_tests.py --type=engine
