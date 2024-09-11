@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   ios_check:
-    runs-on: macos-latest
+    runs-on: kirk
     steps:
     - name: Get code
       uses: actions/checkout@v4
