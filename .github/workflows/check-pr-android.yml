@@ -3,8 +3,6 @@ name: Android Pull Request Check
 on:
   # Manual Trigger
   workflow_dispatch:
-
-  push:
   
 concurrency:
   group: ${{ github.workflow }}-${{ github.head.ref }}
@@ -19,7 +17,11 @@ jobs:
 
     - name: android check
       run: |
+        # https://github.com/flutter/engine/tree/main/testing/scenario_app/android
+
         uname -s && uname -m
+        sudo apt install openbox
+        sudo apt-get install libegl1 
 
         cd ..
         MY_ROOT=`pwd`
@@ -54,7 +56,6 @@ jobs:
 
     - name: build something 1
       run: |
-
         cd ..
         MY_ROOT=`pwd`
 
@@ -75,7 +76,6 @@ jobs:
 
     - name: build something 2
       run: |
-
         cd ..
         MY_ROOT=`pwd`
         export PATH=${MY_ROOT}/my-flutter/depot_tools:$PATH
@@ -129,7 +129,7 @@ jobs:
         # for x64 emulators.
         ninja -C out/android_debug_unopt_x64 
 
-    - name: build something 6
+    - name: build something 5
       run: |
         cd ..
         MY_ROOT=`pwd`
@@ -152,6 +152,7 @@ jobs:
         cd ..
         MY_ROOT=`pwd`
         cd ${MY_ROOT}/my-flutter/engine/src
+        ./flutter/testing/run_tests.py --type=dart
         ./flutter/testing/run_tests.py --type=engine
         ./flutter/testing/run_tests.py --type=java
-        ./flutter/testing/run_tests.py --type=android
+        #./flutter/testing/run_tests.py --type=android

@@ -1,21 +1,23 @@
-name: Felt Test Pull Request Check
+name: iOS Pull Request Check
 
 on:
   # Manual Trigger
   workflow_dispatch:
+
+  push:
   
 concurrency:
   group: ${{ github.workflow }}-${{ github.head.ref }}
   cancel-in-progress: false
 
 jobs:
-  felt_test_check:
-    runs-on: my-ubuntu-latest
+  ios_check:
+    runs-on: macos-latest
     steps:
     - name: Get code
       uses: actions/checkout@v4
 
-    - name: felt test check
+    - name: ios test check
       run: |
         uname -s && uname -m
 
@@ -54,9 +56,16 @@ jobs:
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
         cd ${MY_ROOT}/my-flutter/engine/src
+        ./flutter/tools/gn --ios --unoptimized
         ./flutter/tools/gn --unoptimized
-        ninja -C out/host_debug_unopt
 
-        cd ${MY_ROOT}/my-flutter
-        felt build
-        felt test
+        ninja -C out/ios_debug_unopt
+        ninja -C out/host_debug_unopt
+        
+  - name: android test
+    run: |
+      cd ..
+      MY_ROOT=`pwd`
+      cd ${MY_ROOT}/my-flutter/engine/src
+      ./flutter/testing/run_tests.py --type=dart
+      ./flutter/testing/run_tests.py --type=engine

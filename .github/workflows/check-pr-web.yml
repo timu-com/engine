@@ -1,0 +1,62 @@
+name: Web Pull Request Check
+
+on:
+  # Manual Trigger
+  workflow_dispatch:
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head.ref }}
+  cancel-in-progress: false
+
+jobs:
+  web_check:
+    runs-on: my-ubuntu-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v4
+
+    - name: felt test check
+      run: |
+        uname -s && uname -m
+
+        cd ..
+        MY_ROOT=`pwd`
+        mkdir -p ${MY_ROOT}/my-flutter/engine
+
+        cd ${MY_ROOT}/my-flutter
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        export PATH=${MY_ROOT}/my-flutter/depot_tools:$PATH
+
+        cd ${MY_ROOT}/my-flutter/engine
+        git clone https://github.com/flutter/buildroot src
+
+        cp -r ${GITHUB_WORKSPACE} ${MY_ROOT}/my-flutter/engine/src
+        mv ${MY_ROOT}/my-flutter/engine/src/engine ${MY_ROOT}/my-flutter/engine/src/flutter
+
+        cd ${MY_ROOT}/my-flutter/engine
+        echo 'solutions = [{"custom_deps": {},"custom_vars":{"download_emsdk": True},"deps_file": "DEPS","managed": False,"name": "src/flutter","safesync_url": "","url": "https://github.com/${GITHUB_REPOSITORY}",},]' > .gclient
+
+        FLUTTER_API_BRANCH=main
+        if [ "${FLUTTER_API_BRANCH_OVERRIDE}" != "" ]; then
+          FLUTTER_API_BRANCH=${FLUTTER_BRANCH_OVERRIDE}
+        elif git ls-remote --heads ${FLUTTER_API_GIT_URL} ${GITHUB_BASE_REF} | grep ${GITHUB_BASE_REF} > /dev/null; then
+          FLUTTER_API_BRANCH=${GITHUB_BASE_REF}
+        fi
+
+        #cd ${MY_ROOT}/my-flutter
+        #git clone ${FLUTTER_API_GIT_URL}
+        #cd flutter && git ${FLUTTER_BRANCH}
+
+        cd ${MY_ROOT}/my-flutter/engine
+        gclient sync
+
+        export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
+        export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
+
+        cd ${MY_ROOT}/my-flutter/engine/src
+        ./flutter/tools/gn --unoptimized
+        ninja -C out/host_debug_unopt
+
+        cd ${MY_ROOT}/my-flutter
+        felt build
+        felt test
