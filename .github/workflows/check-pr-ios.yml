@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   ios_check:
-    runs-on: kirk
+    runs-on: uhura
     steps:
     - name: Get code
       uses: actions/checkout@v4
