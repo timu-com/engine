@@ -1119,9 +1119,74 @@ void testMain() {
         _platformView,
         _overlay,
       ]);
+
+      // Scene 4: Same as scene 1 but with a placeholder rectangle painted
+      // under each platform view. This is closer to how the real Flutter
+      // framework would render a grid of platform views. Interestingly, in this
+      // case every drawing can go in a base canvas.
+      final LayerSceneBuilder sb4 = LayerSceneBuilder();
+      sb4.pushOffset(0, 0);
+      sb4.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(0, 0, 300, 300)));
+      sb4.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(10, 10, 50, 50)));
+      sb4.addPlatformView(0,
+          offset: const ui.Offset(10, 10), width: 50, height: 50);
+      sb4.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(70, 10, 50, 50)));
+      sb4.addPlatformView(1,
+          offset: const ui.Offset(70, 10), width: 50, height: 50);
+      sb4.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(130, 10, 50, 50)));
+      sb4.addPlatformView(2,
+          offset: const ui.Offset(130, 10), width: 50, height: 50);
+      final LayerScene scene4 = sb4.build();
+      await renderScene(scene4);
+      _expectSceneMatches(<_EmbeddedViewMarker>[
+        _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
+      ]);
+
+      // Scene 5: A combination of scene 1 and scene 4, where a subtitle is
+      // painted over each platform view and a placeholder is painted under each
+      // one.
+      final LayerSceneBuilder sb5 = LayerSceneBuilder();
+      sb5.pushOffset(0, 0);
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(0, 0, 300, 300)));
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(10, 10, 50, 50)));
+      sb5.addPlatformView(0,
+          offset: const ui.Offset(10, 10), width: 50, height: 50);
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(12, 12, 10, 10)));
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(70, 10, 50, 50)));
+      sb5.addPlatformView(1,
+          offset: const ui.Offset(70, 10), width: 50, height: 50);
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(72, 12, 10, 10)));
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(130, 10, 50, 50)));
+      sb5.addPlatformView(2,
+          offset: const ui.Offset(130, 10), width: 50, height: 50);
+      sb5.addPicture(
+          ui.Offset.zero, rectPicture(const ui.Rect.fromLTWH(132, 12, 10, 10)));
+      final LayerScene scene5 = sb5.build();
+      await renderScene(scene5);
+      _expectSceneMatches(<_EmbeddedViewMarker>[
+        _overlay,
+        _platformView,
+        _platformView,
+        _platformView,
+        _overlay,
+      ]);
     });
 
-    test('sinks platform view under the canvas if it does not overlap with the picture',
+    test(
+        'sinks platform view under the canvas if it does not overlap with the picture',
         () async {
       ui_web.platformViewRegistry.registerViewFactory(
         'test-view',
@@ -1187,7 +1252,6 @@ void testMain() {
       _expectSceneMatches(<_EmbeddedViewMarker>[
         _overlay,
         _platformView,
-        _overlay,
         _platformView,
         _overlay,
       ]);
