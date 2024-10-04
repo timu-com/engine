@@ -649,8 +649,6 @@ skia_component("skia") {
     "$_skia_root/src/android/SkAnimatedImage.cpp",
     "$_skia_root/src/codec/SkAndroidCodec.cpp",
     "$_skia_root/src/codec/SkAndroidCodecAdapter.cpp",
-    "$_skia_root/src/codec/SkEncodedInfo.cpp",
-    "$_skia_root/src/codec/SkParseEncodedOrigin.cpp",
     "$_skia_root/src/codec/SkSampledCodec.cpp",
     "$_skia_root/src/ports/SkDiscardableMemory_none.cpp",
     "$_skia_root/src/ports/SkMemory_malloc.cpp",
