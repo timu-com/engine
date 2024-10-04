@@ -260,8 +260,5 @@ Rendering createOptimizedRendering(
       }
     }
   }
-  if (currentRenderCanvas.pictures.isNotEmpty) {
-    result.add(currentRenderCanvas);
-  }
   return result;
 }
