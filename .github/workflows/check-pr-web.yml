@@ -55,9 +55,9 @@ jobs:
         export PATH=${MY_ROOT}/my-flutter/engine/src/flutter/lib/web_ui/dev:$PATH
         export PATH=${MY_ROOT}/my-flutter/flutter/bin:$PATH
 
-        //cd ${MY_ROOT}/my-flutter/engine/src
-        //./flutter/tools/gn --unoptimized
-        //ninja -C out/host_debug_unopt
+        #cd ${MY_ROOT}/my-flutter/engine/src
+        #./flutter/tools/gn --unoptimized
+        #ninja -C out/host_debug_unopt
 
         cd ${MY_ROOT}/my-flutter
         felt build
